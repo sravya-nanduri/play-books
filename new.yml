@@ -1,0 +1,44 @@
+---
+- name: This playbook if for fun
+  become: yes
+  hosts: webservers[0]
+  tasks:
+   - name: Installing apache server
+     apt:
+      name: apache2
+      state: present
+   - name: Changing source file permissions
+     command: chown -R ansadmin:ansadmin /home/ansadmin/react-app/react-app/assignment-2
+   - name: Copying files from here
+     copy:
+       src: /home/ansadmin/react-app/react-app/assignment-2
+       dest: /home/ansadmin/react-app/react-app/assignment-2
+   - name: Installing nodejs
+     apt:
+       name: nodejs
+       state: present
+   - name: Installing node modules
+     npm: 
+       path: /home/ansadmin/react-app/react-app/assignment-2/assignment-2
+   - name: Generating build file
+     command: npm run build
+     args:
+       chdir: /home/ansadmin/react-app/react-app/assignment-2/assignment-2
+   - name: Changing source file permissions
+     file:
+       path: /home/ansadmin/react-app/react-app/assignment-2/assignment-2/build/
+       mode: 0777
+       owner: ansadmin 
+   - name: Creating a html file
+     file:
+       path: /var/www/html
+       mode: 0777
+       owner: ansadmin 
+   - name: copying buid file in the pwd to var
+     command: rsync -a /home/ansadmin/react-app/react-app/assignment-2/assignment-2/build/ /var/www/html/
+   - name: start httpd service
+     service:
+       name: apache2
+       state: started
+
+
